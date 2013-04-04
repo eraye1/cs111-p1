@@ -37,13 +37,15 @@ typedef struct{
 
 typedef struct{
 	token m_token;
-	token* next;
-	token* prev;
+	token_stream* next;
+	token_stream* prev;
 } token_stream;
 
 token_stream_t insert_token (token_stream_t root, token_t target_token){
 	//traverse to the end of the token_stream_t, insert the token, fix the pointers
-	while (*root)
+	token_stream *iterator = root;
+	while (root->next != NULL)
+		iterator = iterator->
 	
 	
 }
