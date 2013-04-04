@@ -27,4 +27,4 @@ void execute_command (command_t, bool);
 int command_status (command_t);
 
 /* Insert a token*/
-token_stream_t insert_token (token_t);
+token_stream_t insert_token (token_stream_t,token_t);
