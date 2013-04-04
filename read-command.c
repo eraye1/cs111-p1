@@ -35,9 +35,14 @@ typedef struct{
   char* words;
 } token;
 
+typedef struct{
+	token m_token;
+	token* next;
+	token* prev;
+} token_stream;
+
 command_stream_t
-make_command_stream (int (*get_next_byte) (void *),
-		     void *get_next_byte_argument)
+make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument)
 {
   //=========Let's just try to read the input in first.============//
   
