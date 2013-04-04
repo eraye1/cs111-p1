@@ -41,6 +41,13 @@ typedef struct{
 	token* prev;
 } token_stream;
 
+token_stream_t insert_token (token_stream_t root, token_t target_token){
+	//traverse to the end of the token_stream_t, insert the token, fix the pointers
+	while (*root)
+	
+	
+}
+
 command_stream_t
 make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument)
 {
@@ -74,7 +81,7 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
   //we need to do the same thing as before, except instead of taking from the filestream and putting it into the array.
   //Now take the array and put it into a token stream.
 
-  
+
   
   
   //=========Let's return a command stream============//
