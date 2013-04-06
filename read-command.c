@@ -116,7 +116,7 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
   //Could never get the outside function working due to all that referential bullshit.  Let's just do it inline.
 
   
-  token_stream* tstream = (*token_stream) checked_malloc(sizeof(*token_stream));
+  token_stream* tstream = (token_stream*) checked_malloc(sizeof(token_stream*));
   token_stream* trackend = tstream;
   int bufferIteratorT = 0;
   int comment = 0;
@@ -201,29 +201,31 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
     else if (first == '\n')
       {
 	type = NEWLINE_TOKEN;
-      }
-
-    //idea is to figure out how long the word length is and then use token adding part to figure out how far to add the words.  Also, make sure you move ahead in the outer loop.
-    int wordlength = 1;
-    int placeholder = bufferIteratorT;
-    else if (isWordChar(first))  
-      {
-	type = WORD_TOKEN;
-	
-	while (isWordChar(buffer[bufferIteratorT+wordlength])
-	  {
-	    wordlength++;
-	  }
-        bufferIteratorT += wordlength-1;
+	comment = 0;
       }
 
     else //unknown character 
       {
 	type = MISC_TOKEN;
       }
+    //idea is to figure out how long the word length is and then use token adding part to figure out how far to add the words.  Also, make sure you move ahead in the outer loop.  This will also overwrite MISC_TOKEN if word is found
+    int wordlength = 1;
+    int placeholder = bufferIteratorT;
+    if (isWordChar(first))  
+      {
+	type = WORD_TOKEN;
+	
+	while (isWordChar(buffer[bufferIteratorT+wordlength]))
+	  {
+	    wordlength++;
+	  }
+        bufferIteratorT += wordlength-1;
+      }
+
+    
 
     //token insertion here.
-    if (first == ' ' || first == '\t')
+    if (first == ' ' || first == '\t' || comment == 1)
       {
 	//Don't insert
       }
@@ -233,7 +235,7 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
 	temp.type = type;
 	if ( type == WORD_TOKEN)
 	  {
-	    temp.words = (char*) checked_malloc (sizeof((char*wordlength)+1));
+	    temp.words = (char*) checked_malloc ((sizeof(char)*wordlength)+1);
 	    int i = 0;
 	    for (; i != wordlength;i++)
 	    {
@@ -246,7 +248,7 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
 	    temp.words = NULL;	
 	  }
 	//now insert into token stream
-	token_stream* temp_ts = (*token_stream) checked_malloc(sizeof(*token_stream));
+	token_stream* temp_ts = (token_stream*) checked_malloc(sizeof(token_stream*));
 	temp_ts->m_token = temp;  
 	//might have a serious problem here because if m_token is just a copy of 
 	//temp and temp gets erased because temp goes out of scope (e.g. out of this function), 
