@@ -81,6 +81,9 @@ int isWordChar (char input){
     return 0;
 }
 
+//this function is used to output tokens so we can see if it's actually working.
+//TODO: MAYBE NOT NEEDED
+
 command_stream_t
 make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument)
 {
@@ -264,7 +267,14 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
   }
   
   //now tstream should point to the beginning of a token stream
-  
+  puts("WORD_TOKEN: 0 \nSEMICOLON_TOKEN: 1 \nPIPE_TOKEN: 2 \nAND_TOKEN: 3 \nOR_TOKEN: 4 \nLEFT_PAREN_TOKEN: 5 \nRIGHT_PAREN_TOKEN: 6 \nGREATER_TOKEN: 7 \nLESS_TOKEN: 8 \nCOMMENTS_TOKEN: 9 \nNEWLINE_TOKEN: 10 \nMISC_TOKEN: 11 \n");
+  while (tstream->next != NULL)
+    {
+      printf("%d \n", tstream->m_token.type);
+      tstream = tstream->next;
+    }
+  printf("%d \n", tstream->m_token.type);
+
   //=========Let's return a command stream============//
   command_stream_t fake = (command_stream_t) checked_malloc(sizeof(command_stream_t));
   fake->size = 1;
