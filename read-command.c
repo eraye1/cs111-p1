@@ -227,16 +227,24 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
       }
     else 
       {
-	token temp = (
+	token temp;
+	temp.type = type;
 	if ( type == WORD_TOKEN)
 	  {
-	    
-	    //need to alloc space and do different things
+	    temp.words = (char*) checked_malloc (sizeof((char*wordlength)+1));
+	    int i = 0;
+	    for (; i != wordlength;i++)
+	    {
+	    	temp.words[i] = buffer[placeholder+i]; 
+	    }
+	    temp.words[i] = '\0';
 	  }
 	else
 	  {
-       	    //insert token here
+	    temp.words = NULL;	
 	  }
+	//now insert into token stream
+	
       }
 
     bufferIteratorT++;
