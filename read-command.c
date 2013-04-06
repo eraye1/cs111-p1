@@ -203,6 +203,7 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
 
     //idea is to figure out how long the word length is and then use token adding part to figure out how far to add the words.  Also, make sure you move ahead in the outer loop.
     int wordlength = 1;
+    int placeholder = bufferIteratorT;
     else if (isWordChar(first))  
       {
 	type = WORD_TOKEN;
@@ -226,8 +227,10 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
       }
     else 
       {
+	token temp = (
 	if ( type == WORD_TOKEN)
 	  {
+	    
 	    //need to alloc space and do different things
 	  }
 	else
