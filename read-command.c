@@ -5,6 +5,7 @@
 #include "alloc.h"
 #include <error.h>
 #include <stdio.h>
+#include <ctype.h>
 
 /* FIXME: You may need to add #include directives, macro definitions,
    static function definitions, etc.  */
@@ -69,6 +70,16 @@ struct token_stream{
  iterator->next = &temp;
  return root;
  }*/
+
+//this function will return true if the character is part of a word token, else 0
+int isWordChar (char input){
+  if (isalnum(input))
+    return 1;
+  else if (input == '!' || input == '%' || input == '+' || input == ',' || input == '-' || input == '.' || input == '/' || input == ':' || input == '@' || input == '^' || input == '_')
+    return 1;
+  else
+    return 0;
+}
 
 command_stream_t
 make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument)
@@ -190,9 +201,17 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
 	type = NEWLINE_TOKEN;
       }
 
-    else if ()
+    //idea is to figure out how long the word length is and then use token adding part to figure out how far to add the words.  Also, make sure you move ahead in the outer loop.
+    int wordlength = 1;
+    else if (isWordChar(first))  
       {
-
+	type = WORD_TOKEN;
+	
+	while (isWordChar(buffer[bufferIteratorT+wordlength])
+	  {
+	    wordlength++;
+	  }
+        bufferIteratorT += wordlength-1;
       }
 
     else //unknown character 
@@ -207,7 +226,14 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
       }
     else 
       {
-	//insert token here
+	if ( type == WORD_TOKEN)
+	  {
+	    //need to alloc space and do different things
+	  }
+	else
+	  {
+       	    //insert token here
+	  }
       }
 
     bufferIteratorT++;

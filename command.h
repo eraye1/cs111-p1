@@ -6,6 +6,11 @@ typedef struct command *command_t;
 typedef struct command_stream *command_stream_t;
 typedef struct token *token_t;
 typedef struct token_stream *token_stream_t;
+
+
+//returns 1 if word char, else 0
+int isWordChar(char input);
+
 /* Create a command stream from GETBYTE and ARG.  A reader of
    the command stream will invoke GETBYTE (ARG) to get the next byte.
    GETBYTE will return the next input byte, or a negative number
