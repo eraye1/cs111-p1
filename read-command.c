@@ -30,25 +30,31 @@ typedef enum {
   MISC_TOKEN
 } token_type;
 
-typedef struct{
+typedef struct token{
   token_type type;
   char* words;
 } token;
 
-typedef struct{
-	token m_token;
-	token_stream* next;
-	token_stream* prev;
+typedef struct token_stream{
+ token m_token;
+ struct token_stream* next;
+ struct token_stream* prev;
 } token_stream;
 
-token_stream_t insert_token (token_stream_t root, token_t target_token){
-	//traverse to the end of the token_stream_t, insert the token, fix the pointers
-	token_stream *iterator = root;
-	while (root->next != NULL)
-		iterator = iterator->
-	
-	
-}
+//could never get this piece of shit working
+/*token_stream_t insert_token (token_stream_t root, token_t target_token){
+ //traverse to the end of the token_stream_t, insert the token, fix the pointers
+ struct token_stream iterator = *root;
+ while (&root.next != NULL){
+   iterator = (iterator->next);
+ }  
+ struct token_stream temp = (*token_stream) checked_malloc(sizeof(token_stream));
+ temp->m_token = target_token;
+ temp->next = NULL;
+ temp->prev = iterator;
+ iterator->next = &temp;
+ return root;
+ }*/
 
 command_stream_t
 make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument)
