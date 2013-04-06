@@ -116,7 +116,8 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
   //Could never get the outside function working due to all that referential bullshit.  Let's just do it inline.
 
   
-  token_stream_t tstream = (token_stream_t) checked_malloc(sizeof(token_stream_t));
+  token_stream* tstream = (*token_stream) checked_malloc(sizeof(*token_stream));
+  token_stream* trackend = tstream;
   int bufferIteratorT = 0;
   int comment = 0;
   
@@ -133,6 +134,7 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
     empty->size = 0;
     return empty;
   }
+  
   char first;
   char second;
   while (buffer[bufferIteratorT+1] != '\0')
@@ -244,11 +246,22 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
 	    temp.words = NULL;	
 	  }
 	//now insert into token stream
-	
+	token_stream* temp_ts = (*token_stream) checked_malloc(sizeof(*token_stream));
+	temp_ts->m_token = temp;  
+	//might have a serious problem here because if m_token is just a copy of 
+	//temp and temp gets erased because temp goes out of scope (e.g. out of this function), 
+	//temp might get erased and that also deletes our character array for words, leaving a dangling pointer.
+	//Honestly no clue if this part works, might need a redesign of some data structures or at least used differently
+	temp_ts->next = NULL;
+	temp_ts->prev = trackend;
+	trackend->next = temp_ts;
+	trackend = temp_ts;
       }
 
     bufferIteratorT++;
   }
+  
+  //now tstream should point to the beginning of a token stream
   
   //=========Let's return a command stream============//
   command_stream_t fake = (command_stream_t) checked_malloc(sizeof(command_stream_t));
