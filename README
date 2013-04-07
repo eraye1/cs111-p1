@@ -5,6 +5,25 @@ Mentions any special features or limitations.
 
 Minjian Wang:  803775245
 
+Design Schema:
+       So basically right now we're taking a command stream from the input buffer and turning those into a command_stream_t, which is a pointer to a linked list of commands.  We're turning the input into an actual structure to work with.  
+
+       Step 1)  Taking the input and parsing it into a char* buffer.
+       Progress:  Done.
+       Potential Bugs:  Not completely sure the malloc and realloc is working correctly.  I tried to set the initial size to be super small and not checked_grow_alloc at all, but it didn't crash.  Still, I haven't gotten any segfaults yet.  
+       Where:  Starts at line 90.
+
+       Step 2)  Take the char* buffer and turn it into tokens.
+       Progress:  Mostly done.
+       Potential Bugs:  I tested it and it seems like the basc ones like OR, AND, (, etc.  are all working, however, I'm not sure about the comments.  If an ordinary token precedes a # (i.e. ls# < grep), how should we handle that?  My code is pretty easy to modify to deal with this case though, just need to know what to do.
+
+       Step 3)  Validate this and deal with the side cases.
+       Progress:  None.
+       Main Issues:  Need to deal with the bordercases, like what to do about newlines and when can certain tokens be.  Also, finds MISC_TOKENS (this is effectively how we deal with bad inputs in the input->token stage) and reports the error lines to stderr.  Make sure to read the specs for this part so you know how to deal with all the cases and what to do with them.
+
+       Step 4)  Take the token stream and turn them into a command stream.
+       Progress:  None.
+       Main Issues:  Any bugs we have from the previous parts will creep up.  That's why we need to extensively check the previous parts to make sure we don't have any lingering errors or bugs that carry over to this part.  Then it should be fairly straightforward, given a valid token stream (invalid ones are detected in step 3), we'll take it and turn them into commands.  Read the shell syntax rules to understand what to do.  Also, the test-ok-p.sh and test-bad-p.sh scripts are really useful to see exactly what kind of structure is expected for the outputs.
 
 Notes:  
 The first part parses the input into a char* buffer.
