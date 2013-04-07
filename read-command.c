@@ -223,6 +223,9 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
 	    wordlength++;
 	  }
         bufferIteratorT += wordlength-1;
+	printf("placeholder: %d + \n" , placeholder);
+	printf("end: %d \n", bufferIteratorT);
+
       }
 
     
@@ -268,12 +271,27 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
   
   //now tstream should point to the beginning of a token stream
   puts("WORD_TOKEN: 0 \nSEMICOLON_TOKEN: 1 \nPIPE_TOKEN: 2 \nAND_TOKEN: 3 \nOR_TOKEN: 4 \nLEFT_PAREN_TOKEN: 5 \nRIGHT_PAREN_TOKEN: 6 \nGREATER_TOKEN: 7 \nLESS_TOKEN: 8 \nCOMMENTS_TOKEN: 9 \nNEWLINE_TOKEN: 10 \nMISC_TOKEN: 11 \n");
+  
+  //puts(tstream->m_token.words);
+  
   while (tstream->next != NULL)
     {
       printf("%d \n", tstream->m_token.type);
+      //the above line works to display just the tokens, the below doesn't work because there's a segfault on accessing the token words
+      /*if (tstream->m_token.type == WORD_TOKEN)
+	{
+	printf("%d: ", tstream->m_token.type);
+	puts(tstream->m_token.words);
+	puts("\n");
+	}
+      else
+	printf("%d \n", tstream->m_token.type);
+      */
       tstream = tstream->next;
     }
   printf("%d \n", tstream->m_token.type);
+  
+
 
   //=========Let's return a command stream============//
   command_stream_t fake = (command_stream_t) checked_malloc(sizeof(command_stream_t));
