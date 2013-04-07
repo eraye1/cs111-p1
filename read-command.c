@@ -129,8 +129,6 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
   //do a dual parsing here where we handle two characters at the same time. This makes the && and || and comments easy
   //Need to check if the buffer is completely empty (has '\0' as the only character).  Then we don't do anything so we  //can just return
 
-  
-
   if (buffer[bufferIteratorT] == '\0')
   {  
     command_stream_t empty = (command_stream_t) checked_malloc(sizeof(command_stream_t));
@@ -157,7 +155,6 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
           {
 	    type = MISC_TOKEN;  //We can test for MISC_TOKEN later, this is an invalid input, only 1 &
           }
-	  //TODO:  insert token here
       }
     
     //Check for ||
@@ -172,13 +169,17 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
 	  {
 	    type = PIPE_TOKEN;	    
 	  }
-	//TODO:  insert token here
+      }
+
+    else if (first == '#')
+      {
+	type = COMMENTS_TOKEN;
+	comment = 1;
       }
 
     else if (first == ';')
       {
 	type = SEMICOLON_TOKEN;
-	//TODO:  insert token here
       }
 
     else if (first == '(')
@@ -228,8 +229,6 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
 
       }
 
-    
-
     //token insertion here.
     if (first == ' ' || first == '\t' || comment == 1)
       {
@@ -259,7 +258,6 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
 	//might have a serious problem here because if m_token is just a copy of 
 	//temp and temp gets erased because temp goes out of scope (e.g. out of this function), 
 	//temp might get erased and that also deletes our character array for words, leaving a dangling pointer.
-	//Honestly no clue if this part works, might need a redesign of some data structures or at least used differently
 	temp_ts->next = NULL;
 	temp_ts->prev = trackend;
 	trackend->next = temp_ts;
@@ -273,6 +271,9 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
   //the issue is we initialize the tstream to a blank token so happens is the first token_stream in tstream is empty so we skip it.
 
   tstream = tstream->next;
+  
+  //=========Code that outputs the tokens so we can test them============//
+  /*
   puts("WORD_TOKEN: 0 \nSEMICOLON_TOKEN: 1 \nPIPE_TOKEN: 2 \nAND_TOKEN: 3 \nOR_TOKEN: 4 \nLEFT_PAREN_TOKEN: 5 \nRIGHT_PAREN_TOKEN: 6 \nGREATER_TOKEN: 7 \nLESS_TOKEN: 8 \nCOMMENTS_TOKEN: 9 \nNEWLINE_TOKEN: 10 \nMISC_TOKEN: 11 \n");
   
   //puts(tstream->m_token.words);
@@ -293,10 +294,19 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
       tstream = tstream->next;
     }
 printf("%d \n", tstream->m_token.type);
-  
+  */
 
+  //=========Code that checks for input errors and validates the tokens before parsing tokens into commands============//
+  while (tstream->next != NULL){
+    if (tstream->m_token.type == MISC_TOKEN)//we need to detect the line of the error and output that to stderr
+      //fprint(stderr, 
+      // idea here it to represent problems parsing the code with MISC_TOKEN and have code up in the tokenization part where if the 
+      //token is a MISC token, store the line number into the char* words array and if we detect it here, then output it with the line number.
+      //will likely have to do some typecasting to get it to appropriately output.
 
-  //=========Let's return a command stream============//
+  }
+
+  //=========Changes the tokens into commands============//
   command_stream_t fake = (command_stream_t) checked_malloc(sizeof(command_stream_t));
   fake->size = 1;
   fake->iterator = 0;

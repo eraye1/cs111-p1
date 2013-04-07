@@ -2,3 +2,13 @@ This is a skeleton for CS 111 Lab 1.
 
 Replace this README file with notes on your implementation.
 Mentions any special features or limitations.
+
+Minjian Wang:  803775245
+
+
+Notes:  
+The first part parses the input into a char* buffer.
+The second part takes the char* buffer and turns them into our tokens ("tokenization").  
+    we use the MISC_TOKEN to detect bad inputs and then later we can use this to throw an exception or deal with bad inputs this way.
+
+TODO:  Comments currently works, but if we get the character '#' inside a word, it treats it as a comments token.  Not sure if this is the intended behavior and the specs are unclear.
