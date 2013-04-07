@@ -285,7 +285,7 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
 	{
 	printf("%d: ", tstream->m_token.type);
 	puts(tstream->m_token.words);
-	puts("\n");
+	//puts("\n");
 	}
       else
 	printf("%d \n", tstream->m_token.type);
