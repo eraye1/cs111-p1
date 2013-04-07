@@ -7,9 +7,6 @@
 #include <stdio.h>
 #include <ctype.h>
 
-/* FIXME: You may need to add #include directives, macro definitions,
-   static function definitions, etc.  */
-
 struct command_stream {
   int size;
   int iterator;
@@ -31,7 +28,6 @@ typedef enum {
   MISC_TOKEN
 } token_type;
 
-
 typedef struct token{
   token_type type;
   char* words;
@@ -43,34 +39,6 @@ typedef struct token_stream{
  struct token_stream* prev;
 } token_stream;
 
-/*
-struct token{
-  token_type type;
-  char* words;
-};
-
-struct token_stream{
- token m_token;
- struct token_stream* next;
- struct token_stream* prev;
-};
-*/
-
-//could never get this piece of shit working
-/*token_stream_t insert_token (token_stream_t root, token_t target_token){
- //traverse to the end of the token_stream_t, insert the token, fix the pointers
- struct token_stream iterator = *root;
- while (&root.next != NULL){
-   iterator = (iterator->next);
- }  
- struct token_stream temp = (*token_stream) checked_malloc(sizeof(token_stream));
- temp->m_token = target_token;
- temp->next = NULL;
- temp->prev = iterator;
- iterator->next = &temp;
- return root;
- }*/
-
 //this function will return true if the character is part of a word token, else 0
 int isWordChar (char input){
   if (isalnum(input))
@@ -80,9 +48,6 @@ int isWordChar (char input){
   else
     return 0;
 }
-
-//this function is used to output tokens so we can see if it's actually working.
-//TODO: MAYBE NOT NEEDED
 
 command_stream_t
 make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument)
@@ -224,8 +189,8 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
 	    wordlength++;
 	  }
         bufferIteratorT += wordlength-1;
-	printf("placeholder: %d + \n" , placeholder);
-      printf("end: %d \n", bufferIteratorT);
+	//	printf("placeholder: %d + \n" , placeholder);
+	//printf("end: %d \n", bufferIteratorT);
 
       }
 
@@ -273,7 +238,7 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
   tstream = tstream->next;
   
   //=========Code that outputs the tokens so we can test them============//
-  /*
+  
   puts("WORD_TOKEN: 0 \nSEMICOLON_TOKEN: 1 \nPIPE_TOKEN: 2 \nAND_TOKEN: 3 \nOR_TOKEN: 4 \nLEFT_PAREN_TOKEN: 5 \nRIGHT_PAREN_TOKEN: 6 \nGREATER_TOKEN: 7 \nLESS_TOKEN: 8 \nCOMMENTS_TOKEN: 9 \nNEWLINE_TOKEN: 10 \nMISC_TOKEN: 11 \n");
   
   //puts(tstream->m_token.words);
@@ -294,17 +259,16 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
       tstream = tstream->next;
     }
 printf("%d \n", tstream->m_token.type);
-  */
+  
 
   //=========Code that checks for input errors and validates the tokens before parsing tokens into commands============//
-  while (tstream->next != NULL){
-    if (tstream->m_token.type == MISC_TOKEN)//we need to detect the line of the error and output that to stderr
+
       //fprint(stderr, 
       // idea here it to represent problems parsing the code with MISC_TOKEN and have code up in the tokenization part where if the 
       //token is a MISC token, store the line number into the char* words array and if we detect it here, then output it with the line number.
       //will likely have to do some typecasting to get it to appropriately output.
 
-  }
+
 
   //=========Changes the tokens into commands============//
   command_stream_t fake = (command_stream_t) checked_malloc(sizeof(command_stream_t));
