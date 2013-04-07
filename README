@@ -4,6 +4,7 @@ Replace this README file with notes on your implementation.
 Mentions any special features or limitations.
 
 Minjian Wang:  803775245
+Neeraj Khurana: 603795975
 
 Design Schema:
        So basically right now we're taking a command stream from the input buffer and turning those into a command_stream_t, which is a pointer to a linked list of commands.  We're turning the input into an actual structure to work with.  
