@@ -4,7 +4,7 @@ Replace this README file with notes on your implementation.
 Mentions any special features or limitations.
 
 Minjian Wang:  803775245
-Neeraj Khurana: 603795975
+{INSERT PARTNER NAME AND UID HERE}
 
 Design Schema:
        So basically right now we're taking a command stream from the input buffer and turning those into a command_stream_t, which is a pointer to a linked list of commands.  We're turning the input into an actual structure to work with.  
@@ -15,11 +15,11 @@ Design Schema:
        Where:  Starts at line 90.
 
        Step 2)  Take the char* buffer and turn it into tokens.
-       Progress:  Mostly done.
-       Potential Bugs:  I tested it and it seems like the basc ones like OR, AND, (, etc.  are all working, however, I'm not sure about the comments.  If an ordinary token precedes a # (i.e. ls# < grep), how should we handle that?  My code is pretty easy to modify to deal with this case though, just need to know what to do.
+       Progress:  Done
+       Potential Bugs:  I tested it and it seems like the basc ones like OR, AND, (, etc.  are all working, however, I'm not sure about the comments.  Comment validation is done here because we remove the whitespaces in tokenization so not possible to do it after.  My code is pretty easy to modify to deal with this case though, just need to know what to do.
 
        Step 3)  Validate this and deal with the side cases.
-       Progress:  None.
+       Progress:  Done
        Main Issues:  Need to deal with the bordercases, like what to do about newlines and when can certain tokens be.  Also, finds MISC_TOKENS (this is effectively how we deal with bad inputs in the input->token stage) and reports the error lines to stderr.  Make sure to read the specs for this part so you know how to deal with all the cases and what to do with them.
 
        Step 4)  Take the token stream and turn them into a command stream.
@@ -31,4 +31,6 @@ The first part parses the input into a char* buffer.
 The second part takes the char* buffer and turns them into our tokens ("tokenization").  
     we use the MISC_TOKEN to detect bad inputs and then later we can use this to throw an exception or deal with bad inputs this way.
 
-TODO:  Comments currently works, but if we get the character '#' inside a word, it treats it as a comments token.  Not sure if this is the intended behavior and the specs are unclear.
+TODO:  Write the function that convert tokens to commands
+
+Unsure:  Can two newlines follow each other in the script.sh file?  I'm unsure.
