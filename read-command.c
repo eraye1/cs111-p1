@@ -6,7 +6,7 @@
 #include <error.h>
 #include <stdio.h>
 #include <ctype.h>
-
+#include <stdlib.h>
 struct command_stream {
   int size;
   int iterator;
@@ -31,6 +31,7 @@ typedef enum {
 typedef struct token{
   token_type type;
   char* words;
+  int linNum;
 } token;
 
 typedef struct token_stream{
@@ -88,7 +89,8 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
   token_stream* trackend = tstream;
   int bufferIteratorT = 0;
   int comment = 0;
-  
+  int linNumber = 1;
+
   token_type type;
   
   //do a dual parsing here where we handle two characters at the same time. This makes the && and || and comments easy
@@ -138,8 +140,15 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
 
     else if (first == '#')
       {
+	
+	if (bufferIteratorT != 0 && isWordChar(buffer[bufferIteratorT-1]))
+	  {
+	    //if BIT is not 0 , then check if prior is a word, definitely a comment
+	    fprintf(stderr,"%i: problem at this line in script\n", linNumber);
+	    exit(0);
+	  }
 	type = COMMENTS_TOKEN;
-	comment = 1;
+      	comment = 1;
       }
 
     else if (first == ';')
@@ -170,6 +179,7 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
     else if (first == '\n')
       {
 	type = NEWLINE_TOKEN;
+	linNumber++;
 	comment = 0;
       }
 
@@ -191,7 +201,6 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
         bufferIteratorT += wordlength-1;
 	//	printf("placeholder: %d + \n" , placeholder);
 	//printf("end: %d \n", bufferIteratorT);
-
       }
 
     //token insertion here.
@@ -203,6 +212,7 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
       {
 	token temp;
 	temp.type = type;
+	temp.linNum = linNumber;
 	if ( type == WORD_TOKEN)
 	  {
 	    temp.words = (char*) checked_malloc ((sizeof(char)*wordlength)+1);
@@ -228,7 +238,6 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
 	trackend->next = temp_ts;
 	trackend = temp_ts;
       }
-
     bufferIteratorT++;
   }
   
@@ -242,44 +251,92 @@ make_command_stream (int (*get_next_byte) (void *), void *get_next_byte_argument
   puts("WORD_TOKEN: 0 \nSEMICOLON_TOKEN: 1 \nPIPE_TOKEN: 2 \nAND_TOKEN: 3 \nOR_TOKEN: 4 \nLEFT_PAREN_TOKEN: 5 \nRIGHT_PAREN_TOKEN: 6 \nGREATER_TOKEN: 7 \nLESS_TOKEN: 8 \nCOMMENTS_TOKEN: 9 \nNEWLINE_TOKEN: 10 \nMISC_TOKEN: 11 \n");
   
   //puts(tstream->m_token.words);
-  
+  /*
   while (tstream->next != NULL)
     {
       //printf("%d \n", tstream->m_token.type);
       //the above line works to display just the tokens, the below doesn't work because there's a segfault on accessing the token words
       if (tstream->m_token.type == WORD_TOKEN)
 	{
-	printf("%d: ", tstream->m_token.type);
+	  printf("%d:%i: ", tstream->m_token.type, tstream->m_token.linNum);
 	puts(tstream->m_token.words);
 	//puts("\n");
 	}
       else
-	printf("%d \n", tstream->m_token.type);
-      
+	printf("%d:%i \n", tstream->m_token.type, tstream->m_token.linNum);
+    
       tstream = tstream->next;
     }
 printf("%d \n", tstream->m_token.type);
-  
+  */
 
   //=========Code that checks for input errors and validates the tokens before parsing tokens into commands============//
 
-      //fprint(stderr, 
+  int leftParenCount = 0;
+  int rightParenCount = 0;
+  while (tstream != NULL)
+  {
+
+    //MISC_TOKENS find inputs not in our subset syntax
+    if (tstream->m_token.type == MISC_TOKEN)
+      {
+       fprintf(stderr,"%i: problem at this line in script\n", tstream->m_token.linNum);
+       exit(0);
+      }
+
+    //Do count of parentheses 
+    if (tstream->m_token.type == LEFT_PAREN_TOKEN)
+      leftParenCount++;
+    if (tstream->m_token.type == RIGHT_PAREN_TOKEN)
+      rightParenCount++;
+    if (tstream->next == NULL && leftParenCount != rightParenCount)
+      {
+	fprintf(stderr,"%i: Unmatching Parentheses\n", tstream->m_token.linNum);  //not sure about this
+	exit(0);
+      }      
+
+    //Redirec always followed by a word.
+    if (tstream->m_token.type == LESS_TOKEN || tstream->m_token.type == GREATER_TOKEN)
+      {
+	if (tstream->next == NULL)
+	  {
+	    fprintf(stderr,"%i: Redirect Needs a word following it.\n", tstream->m_token.linNum);
+	    exit(0);
+	  }
+	else if (tstream->next->m_token.type != WORD_TOKEN)
+          {
+	    fprintf(stderr,"%i: Need word after redirect\n", tstream->m_token.linNum);  
+	    exit(0);
+	  }        
+      }
+   
+    //Newlines have some specific places they can appear in.
+    if (tstream->m_token.type == NEWLINE_TOKEN)
+      {
+	//check the ones after it for ( ) or words
+	if (tstream->next != NULL)
+	  {
+	    if (tstream->next->m_token.type == LEFT_PAREN_TOKEN || tstream->next->m_token.type == RIGHT_PAREN_TOKEN || tstream->next->m_token.type == WORD_TOKEN)
+	      {}
+	    else
+	      {
+		fprintf(stderr,"%i: newline is followed by (,), or words\n", tstream->m_token.linNum);  
+		exit(0);
+	      }        
+	  }
+      }
+
+    tstream = tstream->next;
+  }
+  
       // idea here it to represent problems parsing the code with MISC_TOKEN and have code up in the tokenization part where if the 
       //token is a MISC token, store the line number into the char* words array and if we detect it here, then output it with the line number.
-      //will likely have to do some typecasting to get it to appropriately output.
-
-
 
   //=========Changes the tokens into commands============//
   command_stream_t fake = (command_stream_t) checked_malloc(sizeof(command_stream_t));
   fake->size = 1;
   fake->iterator = 0;
   return fake;
-  
-  
-
-  //error (1, 0, "command reading not yet implemented");
-  return 0;
 }
 
 command_t
@@ -287,7 +344,6 @@ read_command_stream (command_stream_t s)
 {
   s->size = 1;
   
-  /* FIXME: Replace this with your implementation too.  */
   error (1, 0, "command reading not yet implemented");
   return 0;
 }
